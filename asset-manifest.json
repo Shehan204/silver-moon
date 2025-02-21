@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/silver-moon/static/css/main.08ca1bbd.css",
+    "main.js": "/silver-moon/static/js/main.8ba5f1bc.js",
+    "index.html": "/silver-moon/index.html",
+    "main.08ca1bbd.css.map": "/silver-moon/static/css/main.08ca1bbd.css.map",
+    "main.8ba5f1bc.js.map": "/silver-moon/static/js/main.8ba5f1bc.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.08ca1bbd.css",
+    "static/js/main.8ba5f1bc.js"
+  ]
+}

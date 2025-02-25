@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { db } from '../firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 const useStore = create((set, get) => ({
   // Main state
@@ -13,10 +15,7 @@ const useStore = create((set, get) => ({
 
   // Node actions
   addNode: (node) => {
-    // Prevent adding multiple home nodes
-    if (node.type === 'Home' && get().nodes.some(n => n.type === 'Home')) {
-      return;
-    }
+    if (node.type === 'Home' && get().nodes.some(n => n.type === 'Home')) return;
     
     set((state) => ({
       nodes: [...state.nodes, {
@@ -24,14 +23,20 @@ const useStore = create((set, get) => ({
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }],
-      history: [...state.history.slice(-9), { nodes: state.nodes, connections: state.connections }]
+      history: [...state.history.slice(-9), { 
+        nodes: state.nodes, 
+        connections: state.connections 
+      }]
     }));
   },
 
   removeNode: (id) => set((state) => ({
     nodes: state.nodes.filter(n => n.id !== id),
     connections: state.connections.filter(c => c.from !== id && c.to !== id),
-    history: [...state.history.slice(-9), { nodes: state.nodes, connections: state.connections }]
+    history: [...state.history.slice(-9), { 
+      nodes: state.nodes, 
+      connections: state.connections 
+    }]
   })),
 
   updateNodePosition: (id, x, y) => set((state) => ({
@@ -78,14 +83,72 @@ const useStore = create((set, get) => ({
         id: `conn_${Date.now()}`,
         createdAt: new Date().toISOString()
       }],
-      history: [...state.history.slice(-9), { nodes: state.nodes, connections: state.connections }]
+      history: [...state.history.slice(-9), { 
+        nodes: state.nodes, 
+        connections: state.connections 
+      }]
     };
   }),
 
   removeConnection: (id) => set((state) => ({
     connections: state.connections.filter(c => c.id !== id),
-    history: [...state.history.slice(-9), { nodes: state.nodes, connections: state.connections }]
+    history: [...state.history.slice(-9), { 
+      nodes: state.nodes, 
+      connections: state.connections 
+    }]
   })),
+
+  // Project management
+  importState: (newState) => set({
+    nodes: newState.nodes || [],
+    connections: newState.connections || [],
+    history: []
+  }),
+
+  // Firebase integration
+  uploadToFirebase: async (projectName) => {
+    try {
+      const { nodes, connections } = get();
+      const sanitizedProjectName = projectName
+        .replace(/\s+/g, '_')
+        .replace(/[^a-zA-Z0-9_-]/g, '')
+        .substring(0, 50);
+
+      await setDoc(doc(db, 'projects', sanitizedProjectName), {
+        nodes,
+        connections,
+        projectName,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      });
+      return true;
+    } catch (error) {
+      console.error('Firebase upload error:', error);
+      return false;
+    }
+  },
+
+  loadFromFirebase: async (projectId) => {
+    try {
+      const docRef = doc(db, 'projects', projectId);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        set({
+          nodes: data.nodes || [],
+          connections: data.connections || [],
+          placingNodeType: null,
+          previewPosition: null
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Firebase load error:', error);
+      return false;
+    }
+  },
 
   // Placement actions
   setPlacingNodeType: (type) => set({ placingNodeType: type }),
@@ -103,13 +166,7 @@ const useStore = create((set, get) => ({
     } : null
   })),
 
-  // Project management
-  importState: (newState) => set({
-    nodes: newState.nodes || [],
-    connections: newState.connections || [],
-    history: []
-  }),
-
+  // Canvas management
   clearCanvas: () => {
     if (window.confirm('Clear all nodes and connections?')) {
       set({ nodes: [], connections: [], history: [] });

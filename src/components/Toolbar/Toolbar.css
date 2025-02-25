@@ -248,3 +248,133 @@
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
 }
+
+.toolbar-btn.firebase-btn {
+  background: linear-gradient(135deg, #FFA000 0%, #FF6F00 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.toolbar-btn.firebase-btn:hover::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0) 25%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0) 75%
+  );
+  animation: fire-glow 2s infinite linear;
+}
+
+@keyframes fire-glow {
+  0% { transform: translateX(-50%) translateY(-50%) rotate(45deg); }
+  100% { transform: translateX(50%) translateY(50%) rotate(45deg); }
+}
+
+/* Upload Status Bar */
+.upload-status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  display: flex;
+  align-items: center;
+  z-index: 2000;
+}
+
+.upload-progress {
+  height: 100%;
+  background: #3b82f6;
+  transition: width 0.3s ease;
+}
+
+.upload-message {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+}
+
+/* Firebase Load Modal */
+.firebase-load-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 600px;
+  max-width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.project-list {
+  margin-top: 1rem;
+}
+
+.project-item {
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.project-item:hover {
+  background: #f8fafc;
+  transform: translateX(5px);
+}
+
+.project-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.project-date {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.loading-projects {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+}
+
+/* New button style */
+.toolbar-btn.firebase-load-btn {
+  background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+  color: white;
+}

@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import useStore from '../../stores/useStore';
 import { useConfirmation } from '../Shared/ConfirmationDialog';
 
@@ -9,51 +9,58 @@ const ConnectionLine = memo(({ connection, isTemp, x1, y1, x2, y2 }) => {
         removeConnection: state.removeConnection
     }));
 
+    const [calculatedPoints, setCalculatedPoints] = useState(null);
+    const [strokeColor, setStrokeColor] = useState('#3b82f6');
     const confirm = useConfirmation();
 
-    let finalX1 = x1, finalY1 = y1, finalX2 = x2, finalY2 = y2;
-    let strokeColor = '#3b82f6'; // Default blue for scenes
+    useEffect(() => {
+        const calculateConnectionPoints = () => {
+            if (!connection) return;
 
-    if (connection) {
-        const toNode = nodes.find(n => n.id === connection.to);
-        if (toNode) {
-            switch(toNode.type.toLowerCase()) {
-                case 'goodending':
-                    strokeColor = '#10b981'; // Green for good endings
-                    break;
-                case 'badending':
-                    strokeColor = '#ef4444'; // Red for bad endings
-                    break;
-                case 'home':
-                    strokeColor = '#f59e0b'; // Orange for home node
-                    break;
-                default:
-                    strokeColor = '#3b82f6'; // Blue for regular scenes
+            const toNode = nodes.find(n => n.id === connection.to);
+            const fromNode = nodes.find(n => n.id === connection.from);
+            
+            if (!toNode || !fromNode) {
+                setCalculatedPoints(null);
+                return;
             }
-        }
 
-        const fromNode = nodes.find(n => n.id === connection.from);
-        if (fromNode && toNode) {
-            const fromNodeEl = document.querySelector(`[data-node-id="${fromNode.id}"] .connection-dot`);
-            const toNodeEl = document.querySelector(`[data-node-id="${toNode.id}"] .connection-dot`);
+            // Determine stroke color based on target node type
+            const newColor = {
+                'goodending': '#10b981',
+                'badending': '#ef4444',
+                'home': '#f59e0b'
+            }[toNode.type.toLowerCase()] || '#3b82f6';
+            setStrokeColor(newColor);
 
-            if (fromNodeEl && toNodeEl) {
-                const fromRect = fromNodeEl.getBoundingClientRect();
-                const toRect = toNodeEl.getBoundingClientRect();
-                const canvasRect = document.querySelector('.canvas-container').getBoundingClientRect();
+            // Get DOM elements with slight delay to ensure render
+            setTimeout(() => {
+                const fromEl = document.querySelector(`[data-node-id="${fromNode.id}"] .connection-dot`);
+                const toEl = document.querySelector(`[data-node-id="${toNode.id}"] .connection-dot`);
+                const canvas = document.querySelector('.canvas-container');
 
-                finalX1 = (fromRect.left + fromRect.width/2 - canvasRect.left + 
-                          document.querySelector('.canvas-container').scrollLeft) / zoomLevel;
-                finalY1 = (fromRect.top + fromRect.height/2 - canvasRect.top + 
-                          document.querySelector('.canvas-container').scrollTop) / zoomLevel;
+                if (!fromEl || !toEl || !canvas) {
+                    setCalculatedPoints(null);
+                    return;
+                }
 
-                finalX2 = (toRect.left + toRect.width/2 - canvasRect.left + 
-                          document.querySelector('.canvas-container').scrollLeft) / zoomLevel;
-                finalY2 = (toRect.top + toRect.height/2 - canvasRect.top + 
-                          document.querySelector('.canvas-container').scrollTop) / zoomLevel;
-            }
-        }
-    }
+                const canvasRect = canvas.getBoundingClientRect();
+                const fromRect = fromEl.getBoundingClientRect();
+                const toRect = toEl.getBoundingClientRect();
+
+                const newPoints = {
+                    x1: (fromRect.left + fromRect.width/2 - canvasRect.left + canvas.scrollLeft) / zoomLevel,
+                    y1: (fromRect.top + fromRect.height/2 - canvasRect.top + canvas.scrollTop) / zoomLevel,
+                    x2: (toRect.left + toRect.width/2 - canvasRect.left + canvas.scrollLeft) / zoomLevel,
+                    y2: (toRect.top + toRect.height/2 - canvasRect.top + canvas.scrollTop) / zoomLevel
+                };
+
+                setCalculatedPoints(newPoints);
+            }, 50);
+        };
+
+        calculateConnectionPoints();
+    }, [nodes, connection, zoomLevel]);
 
     const handleDelete = async (e) => {
         e.stopPropagation();
@@ -63,8 +70,13 @@ const ConnectionLine = memo(({ connection, isTemp, x1, y1, x2, y2 }) => {
         }
     };
 
-    if (finalX1 === undefined || finalY1 === undefined || 
-        finalX2 === undefined || finalY2 === undefined) return null;
+    if (!calculatedPoints || 
+        calculatedPoints.x1 === undefined || 
+        calculatedPoints.y1 === undefined || 
+        calculatedPoints.x2 === undefined || 
+        calculatedPoints.y2 === undefined) {
+        return null;
+    }
 
     return (
         <g 
@@ -73,10 +85,10 @@ const ConnectionLine = memo(({ connection, isTemp, x1, y1, x2, y2 }) => {
             style={{ cursor: 'pointer' }}
         >
             <line
-                x1={finalX1}
-                y1={finalY1}
-                x2={finalX2}
-                y2={finalY2}
+                x1={calculatedPoints.x1}
+                y1={calculatedPoints.y1}
+                x2={calculatedPoints.x2}
+                y2={calculatedPoints.y2}
                 stroke={isTemp ? '#3b82f6' : strokeColor}
                 strokeWidth={3.5}
                 className={isTemp ? 'temporary-connection' : 'permanent-connection'}

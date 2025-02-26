@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/silver-moon/static/css/main.08ca1bbd.css",
-    "main.js": "/silver-moon/static/js/main.8ba5f1bc.js",
+    "main.css": "/silver-moon/static/css/main.93aff287.css",
+    "main.js": "/silver-moon/static/js/main.0385b2af.js",
     "index.html": "/silver-moon/index.html",
-    "main.08ca1bbd.css.map": "/silver-moon/static/css/main.08ca1bbd.css.map",
-    "main.8ba5f1bc.js.map": "/silver-moon/static/js/main.8ba5f1bc.js.map"
+    "main.93aff287.css.map": "/silver-moon/static/css/main.93aff287.css.map",
+    "main.0385b2af.js.map": "/silver-moon/static/js/main.0385b2af.js.map"
   },
   "entrypoints": [
-    "static/css/main.08ca1bbd.css",
-    "static/js/main.8ba5f1bc.js"
+    "static/css/main.93aff287.css",
+    "static/js/main.0385b2af.js"
   ]
 }

@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/silver-moon/static/css/main.93aff287.css",
-    "main.js": "/silver-moon/static/js/main.0385b2af.js",
+    "main.js": "/silver-moon/static/js/main.507ba507.js",
     "index.html": "/silver-moon/index.html",
     "main.93aff287.css.map": "/silver-moon/static/css/main.93aff287.css.map",
-    "main.0385b2af.js.map": "/silver-moon/static/js/main.0385b2af.js.map"
+    "main.507ba507.js.map": "/silver-moon/static/js/main.507ba507.js.map"
   },
   "entrypoints": [
     "static/css/main.93aff287.css",
-    "static/js/main.0385b2af.js"
+    "static/js/main.507ba507.js"
   ]
 }

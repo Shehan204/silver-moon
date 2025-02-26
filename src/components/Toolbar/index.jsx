@@ -201,7 +201,7 @@ export default function Toolbar() {
           <input
             id="load-input"
             type="file"
-            accept=".cyoa"
+            accept=".json"
             hidden
             onChange={handleLoad}
           />
